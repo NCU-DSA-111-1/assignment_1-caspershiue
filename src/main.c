@@ -1,7 +1,7 @@
 #include "backprop.h"
 #include "layer.h"
 #include "neuron.h"
-
+#define learningtimes 20000
 
 layer *lay = NULL;
 int num_layers;
@@ -11,13 +11,18 @@ float *cost;
 float full_cost;
 float **input;
 float **desired_outputs;
+float error=0;
+float SUM=0;
 int num_training_ex;
 int n=1;
-
+int it;
+FILE *fptr;
+void storedata(int it);
 int main(void)
 {
     int i;
-
+    if ((fptr = fopen("Data.csv", "w+")) == NULL)// Open the file "Data.csv"
+		printf("File could not be opened\n");
     srand(time(0));
 
     printf("Enter the number of Layers in Neural Network:\n");
@@ -226,7 +231,7 @@ void train_neural_net(void)
     int it=0;
 
     // Gradient Descent
-    for(it=0;it<20000;it++)
+    for(it=0;it<learningtimes;it++)
     {
         for(i=0;i<num_training_ex;i++)
         {
@@ -236,10 +241,16 @@ void train_neural_net(void)
             back_prop(i);
             update_weights();
         }
+        storedata(it);
     }
+    fclose(fptr);
 }
-
-
+//Four data as a group(00,01,10,11). Get the average SME of a group and write down to the opened file
+void storedata(int it)
+{
+    SUM=error/(4*(it+1));
+    fprintf(fptr,"%f\n",SUM);
+}
 
 void update_weights(void)
 {
@@ -307,17 +318,18 @@ void compute_cost(int i)
     int j;
     float tmpcost=0;
     float tcost=0;
-
     for(j=0;j<num_neurons[num_layers-1];j++)
     {
         tmpcost = desired_outputs[i][j] - lay[num_layers-1].neu[j].actv;
         cost[j] = (tmpcost * tmpcost)/2;
         tcost = tcost + cost[j];
+        error=error+tmpcost*tmpcost;//Compute and accumulate four data's SME
     }   
-
+    
     full_cost = (full_cost + tcost)/n;
     n++;
-    // printf("Full Cost: %f\n",full_cost);
+    
+    
 }
 
 // Back Propogate Error
@@ -391,6 +403,10 @@ int dinit(void)
 {
     // TODO:
     // Free up all the structures
-
+    free(num_neurons);
+    free(input);
+    free(desired_outputs);
+    free(cost);
+    free(lay);
     return SUCCESS_DINIT;
 }
