@@ -3,10 +3,24 @@
 Assignment 1
 
 # Compile
-cd work/NN
-gcc main.c -lm layer.c neuron.c
+```
+gcc -g -Wall -Werror -c -o main.c
+gcc -g -Wall -Werror -c layer.c
+gcc -g -Wall -Werror -c neuron.c
+gcc -pthread -lpthread -o backprop main.o layer.o neuron.o -lm
+```
+or
+```
+make
+```
 # Run
-./a.out
+```
+./bin/backprop
+```
+or
+```
+make run
+```
 Enter the number of Layers in Neural Network: 4 <br />
 Enter number of neurons in layer[1]:  2 <br />
 Enter number of neurons in layer[2]:  4 <br />
