@@ -21,8 +21,10 @@ void storedata(int it);
 int main(void)
 {
     int i;
-    if ((fptr = fopen("Data.csv", "w+")) == NULL)// Open the file "Data.csv"
+    if ((fptr = fopen("Data.csv", "w+")) == NULL){  // Open the file "Data.csv"
 		printf("File could not be opened\n");
+        return 0;
+    }
     srand(time(0));
 
     printf("Enter the number of Layers in Neural Network:\n");
